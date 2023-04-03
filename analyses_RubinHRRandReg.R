@@ -25,19 +25,27 @@ hrd1 <- hrd[which(!is.na(hrd$HR1)), ]
 hrd2 <- hrd[which(!is.na(hrd$HR2)), ]
 
 ## Make R factors
-hrd$EggID <- as.factor(hrd$EggID)
-  hrd1$EggID <- as.factor(hrd1$EggID)
-  hrd2$EggID <- as.factor(hrd2$EggID)
-hrd$NestID <- as.factor(hrd$NestID)
-  hrd1$NestID <- as.factor(hrd1$NestID)
-  hrd2$NestID <- as.factor(hrd2$NestID)
-hrd$Trt <- as.factor(hrd$Trt)
-  hrd1$Trt <- as.factor(hrd1$Trt)
-  hrd2$Trt <- as.factor(hrd2$Trt)
-hrd$Order1fac <- as.factor(hrd$Order1fac)
-  hrd1$Order1fac <- as.factor(hrd1$Order1fac)
-hrd$Order2fac <- as.factor(hrd$Order2fac)
-  hrd2$Order2fac <- as.factor(hrd2$Order2fac)
+hrd <- within(hrd, {
+  EggID <- as.factor(EggID)
+  NestID <- as.factor(NestID)
+  Trt <- as.factor(Trt)
+  Order1fac <- as.factor(Order1fac)
+  Order2fac <- as.factor(Order2fac)
+  })
+  
+hrd1 <- within(hrd1, {
+  EggID <- as.factor(EggID)
+  NestID <- as.factor(NestID)
+  Trt <- as.factor(Trt)
+  Order1fac <- as.factor(Order1fac)
+  })
+  
+hrd2 <- within(hrd2, {
+  EggID <- as.factor(EggID)
+  NestID <- as.factor(NestID)
+  Trt <- as.factor(Trt)
+  Order2fac <- as.factor(Order2fac)
+  })
 
 
 # Color palette
