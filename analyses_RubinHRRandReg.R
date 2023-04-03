@@ -56,20 +56,10 @@ clr <- structure(c(blue = "#03244d", cyan = "#00A08A", orange = "#e86823"),
 # check:
 ## colorblindcheck::palette_check(clr, plot = TRUE)
 
-# Create gradient between colors so one unique per ID
-## Number of unique IDs in each treatment
-#aggregate(EggID ~ Trt, data = hrd, FUN = function(x) length(unique(x)))
-nin <- length(levels(hrd$EggID))
-clrg <-  structure(grDevices::colorRampPalette(clr)(nin),
-    class = "palette",
-    name = "aucfriend heat gradient")
 # Make transparent versions for plotting in the "background"
 clr_trans <- structure(adjustcolor(clr, alpha.f = 0.4),
   class = "palette",
   name = "aucfriend semi-transparent")
-clrg_trans <- structure(adjustcolor(clrg, alpha.f = 0.4),
-  class = "palette",
-  name = "aucfiend heat gradient semi-transparent")
   
 
 
@@ -856,12 +846,11 @@ pForm <- as.formula(paste0("scHR", Tnumb, "~ ", Tcov))
       ### Plot Individual observations
       points(x = sub_datf[, Tcov],
         y = sub_datf[, paste0("scHR", Tnumb)],
-        col = clrg_trans[cnt], pch = 21, lwd = 2, cex = 0.8)
+        col = clr_trans[cnt], pch = 21, lwd = 2, cex = 0.8)
       ### Add predicted regression
       lines(x = sub_datf[, Tcov],
             y = sub_datf[, "pred1"],
-            col = clrg[cnt], lwd = 1)
-      cnt <- cnt + 1
+            col = clr[cnt], lwd = 1)
     }  #<-- end for i in unique IDs
 
     if(t == "low"){
@@ -871,6 +860,7 @@ pForm <- as.formula(paste0("scHR", Tnumb, "~ ", Tcov))
         col = "grey80",
         legend = c("observed", "predicted"))
     } 
+    cnt <- cnt + 1
      
   }  #<-- end for t in Treatments
   mtext(text = expression(bold(A)),
@@ -926,12 +916,11 @@ pForm <- as.formula(paste0("scHR", Tnumb, "~ ", Tcov))
       ### Plot Individual observations
       points(x = sub_datf[, Tcov],
         y = sub_datf[, paste0("scHR", Tnumb)],
-        col = clrg_trans[cnt], pch = 21, lwd = 2, cex = 0.8)
+        col = clr_trans[cnt], pch = 21, lwd = 2, cex = 0.8)
       ### Add predicted regression
       lines(x = sub_datf[, Tcov],
             y = sub_datf[, "pred2"],
-            col = clrg[cnt], lwd = 1)
-      cnt <- cnt + 1
+            col = clr[cnt], lwd = 1)
     }  #<-- end for i in unique IDs
 
     if(t == "low"){
@@ -941,6 +930,7 @@ pForm <- as.formula(paste0("scHR", Tnumb, "~ ", Tcov))
         col = "grey80",
         legend = c("observed", "predicted"))
     } 
+    cnt <- cnt + 1
      
   }  #<-- end for t in Treatments
   mtext(text = expression(bold(A)),
@@ -1073,16 +1063,15 @@ pForm <- as.formula(paste0("scHR", Tnumb, "~ ", Tcov))
       ### Plot Individual observations
       points(x = sub_datf[, Tcov],
         y = sub_datf[, paste0("scHR", Tnumb)],
-        col = clrg_trans[cnt], pch = 21, lwd = 2, cex = 0.8)
+        col = clr_trans[cnt], pch = 21, lwd = 2, cex = 0.8)
       ### Add smoothed spline
       #### (only if have >3 measurement)
       if(nrow(sub_datf) > 3){
         lines(smooth.spline(x = sub_datf[, Tcov],
             y = sub_datf[, paste0("scHR", Tnumb)],
-            cv = TRUE),  #<-- uses generalized cross-validation
-          col = clrg[cnt], lwd = 1)
+            cv = FALSE),  #<-- uses generalized cross-validation
+          col = clr[cnt], lwd = 1)
       }
-      cnt <- cnt + 1
     }  #<-- end for i in unique IDs
 
     if(t == "low"){
@@ -1092,6 +1081,7 @@ pForm <- as.formula(paste0("scHR", Tnumb, "~ ", Tcov))
         col = "grey80",
         legend = c("observed", "smoothed spline"))
     } 
+    cnt <- cnt + 1
      
   }  #<-- end for t in Treatments
   mtext(text = expression(bold(A)),
@@ -1152,16 +1142,15 @@ pForm <- as.formula(paste0("scHR", Tnumb, "~ ", Tcov))
       ### Plot Individual observations
       points(x = sub_datf[, Tcov],
         y = sub_datf[, paste0("scHR", Tnumb)],
-        col = clrg_trans[cnt], pch = 21, lwd = 2, cex = 0.8)
+        col = clr_trans[cnt], pch = 21, lwd = 2, cex = 0.8)
       ### Add smoothed spline
       #### (only if have >3 measurement)
       if(nrow(sub_datf) > 3){
         lines(smooth.spline(x = sub_datf[, Tcov],
             y = sub_datf[, paste0("scHR", Tnumb)],
             cv = FALSE),  #<-- uses generalized cross-validation
-          col = clrg[cnt], lwd = 1)
+          col = clr[cnt], lwd = 1)
       }
-      cnt <- cnt + 1
     }  #<-- end for i in unique IDs
 
     if(t == "low"){
@@ -1171,6 +1160,7 @@ pForm <- as.formula(paste0("scHR", Tnumb, "~ ", Tcov))
         col = "grey80",
         legend = c("observed", "smoothed spline"))
     } 
+    cnt <- cnt + 1
      
   }  #<-- end for t in Treatments
   mtext(text = expression(bold(A)),
