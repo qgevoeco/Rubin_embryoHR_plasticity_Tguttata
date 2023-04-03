@@ -812,7 +812,148 @@ dev.off()
 
 
 
+###############################################################
+# Individual predicted reaction norms
+###############################################################
+# Plot regression lines, by individual, to data
 
+#####   30% Development   ###################
+sdata <- hrd  #<-- define temporary data for plotting script
+dev <- 30
+sdata$pred1 <- predict(hr1_fullFxd_Trt_REML, re.form = NULL)
+
+
+pdf(file = "Fig4_individRxnNorms_30dev.pdf",
+  width = 12, height = 5)
+#x11(w = 12, h = 5)
+##########
+par(mfrow = c(1, 3), mar = c(6, 6, 4, 1.1), cex.lab = 1.5, cex.axis = 1.4)
+##########
+Tnumb <- ifelse(dev == 30, 1, 2)
+Tcov <- paste0("T", Tnumb)
+pForm <- as.formula(paste0("scHR", Tnumb, "~ ", Tcov))
+
+### Go through each individual within each treatment:
+  cnt <- 1
+  for(t in levels(sdata$Trt)){
+    plot(pForm, data = sdata, type = "n", axes = FALSE,
+      xlim = c(0, 1.2),
+      ylim = c(-2.8, 3.45),
+      main = "",
+      xlab = "Time (min.)",
+      ylab = "30% Development\nHeart rate (standardized bpm)")
+    axis(1)
+    axis(2)
+    uid <- unique(as.character(sdata$EggID[which(sdata$Trt == t)]))
+
+    
+    for(i in uid){
+      ### Subset data for i-th ID/individual
+      sub_datf <- subset(sdata, EggID == i)
+      #### Order subsetted data by increasing Time
+      ##### Needed to plot lines
+      sub_datf <- sub_datf[order(sub_datf[, Tcov]), ]
+      ### Plot Individual observations
+      points(x = sub_datf[, Tcov],
+        y = sub_datf[, paste0("scHR", Tnumb)],
+        col = clrg_trans[cnt], pch = 21, lwd = 2, cex = 0.8)
+      ### Add predicted regression
+      lines(x = sub_datf[, Tcov],
+            y = sub_datf[, "pred1"],
+            col = clrg[cnt], lwd = 1)
+      cnt <- cnt + 1
+    }  #<-- end for i in unique IDs
+
+    if(t == "low"){
+      legend("top",
+        pch = c(21, NA), pt.lwd = 2,
+        lwd = c(NA, 3),
+        col = "grey80",
+        legend = c("observed", "predicted"))
+    } 
+     
+  }  #<-- end for t in Treatments
+  mtext(text = expression(bold(A)),
+    side = 3, line = 1, adj = -3.0, cex = 1.5)
+  mtext(text = expression(bold(B)),
+    side = 3, line = 1, adj = -1.6, cex = 1.5)
+  mtext(text = expression(bold(C)),
+    side = 3, line = 1, adj = -0.2, cex = 1.5)
+
+
+
+
+dev.off() 
+
+
+
+#####   80% Development   ###################
+sdata <- hrd  #<-- define temporary data for plotting script
+dev <- 80
+sdata$pred2 <- predict(hr2_fullFxd_Trt_REML, re.form = NULL)
+
+
+pdf(file = "Fig5_individRxnNorms_80dev.pdf",
+  width = 12, height = 5)
+#x11(w = 12, h = 5)
+##########
+par(mfrow = c(1, 3), mar = c(6, 6, 4, 1.1), cex.lab = 1.5, cex.axis = 1.4)
+##########
+Tnumb <- ifelse(dev == 30, 1, 2)
+Tcov <- paste0("T", Tnumb)
+pForm <- as.formula(paste0("scHR", Tnumb, "~ ", Tcov))
+
+### Go through each individual within each treatment:
+  cnt <- 1
+  for(t in levels(sdata$Trt)){
+    plot(pForm, data = sdata, type = "n", axes = FALSE,
+      xlim = c(0, 1.2),
+      ylim = c(-2.8, 3.45),
+      main = "",
+      xlab = "Time (min.)",
+      ylab = "80% Development\nHeart rate (standardized bpm)")
+    axis(1)
+    axis(2)
+    uid <- unique(as.character(sdata$EggID[which(sdata$Trt == t)]))
+
+    
+    for(i in uid){
+      ### Subset data for i-th ID/individual
+      sub_datf <- subset(sdata, EggID == i & !is.na(sdata$pred2))
+      #### Order subsetted data by increasing Time
+      ##### Needed to plot lines
+      sub_datf <- sub_datf[order(sub_datf[, Tcov]), ]
+      ### Plot Individual observations
+      points(x = sub_datf[, Tcov],
+        y = sub_datf[, paste0("scHR", Tnumb)],
+        col = clrg_trans[cnt], pch = 21, lwd = 2, cex = 0.8)
+      ### Add predicted regression
+      lines(x = sub_datf[, Tcov],
+            y = sub_datf[, "pred2"],
+            col = clrg[cnt], lwd = 1)
+      cnt <- cnt + 1
+    }  #<-- end for i in unique IDs
+
+    if(t == "low"){
+      legend("top",
+        pch = c(21, NA), pt.lwd = 2,
+        lwd = c(NA, 3),
+        col = "grey80",
+        legend = c("observed", "predicted"))
+    } 
+     
+  }  #<-- end for t in Treatments
+  mtext(text = expression(bold(A)),
+    side = 3, line = 1, adj = -3.0, cex = 1.5)
+  mtext(text = expression(bold(B)),
+    side = 3, line = 1, adj = -1.6, cex = 1.5)
+  mtext(text = expression(bold(C)),
+    side = 3, line = 1, adj = -0.2, cex = 1.5)
+
+
+
+
+dev.off() 
 
 
 
@@ -884,6 +1025,7 @@ cbind(aggregate(HR2 ~ Trt, data = msreCntsByEggID2, FUN = length),
 
 
 
+
 ################################################################################
 
 #			SI 2
@@ -897,7 +1039,6 @@ cbind(aggregate(HR2 ~ Trt, data = msreCntsByEggID2, FUN = length),
 ## 30% Development
 sdata <- hrd1  #<-- define temporary "smooth data" for plotting script
 dev <- 30
-
 
 
 
@@ -938,7 +1079,7 @@ pForm <- as.formula(paste0("scHR", Tnumb, "~ ", Tcov))
       if(nrow(sub_datf) > 3){
         lines(smooth.spline(x = sub_datf[, Tcov],
             y = sub_datf[, paste0("scHR", Tnumb)],
-            cv = FALSE),  #<-- uses generalized cross-validation
+            cv = TRUE),  #<-- uses generalized cross-validation
           col = clrg[cnt], lwd = 1)
       }
       cnt <- cnt + 1
