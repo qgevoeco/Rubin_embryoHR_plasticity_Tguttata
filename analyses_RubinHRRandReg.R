@@ -805,13 +805,14 @@ dev.off()
 ###############################################################
 # Individual predicted reaction norms
 ###############################################################
-# Plot regression lines, by individual, to data
+# Plot regression lines, by individual, to data on ORIGINAL scale of heart rates
 
 #####   30% Development   ###################
 sdata <- hrd  #<-- define temporary data for plotting script
 dev <- 30
 sdata$pred1 <- predict(hr1_fullFxd_Trt_REML, re.form = NULL)
-
+  sdata$pred1 <- sdata$pred1 * sd(sdata$HR1, na.rm = TRUE) +
+    mean(sdata$HR1, na.rm = TRUE)
 
 pdf(file = "Fig4_individRxnNorms_30dev.pdf",
   width = 12, height = 5)
@@ -821,19 +822,20 @@ par(mfrow = c(1, 3), mar = c(6, 6, 4, 1.1), cex.lab = 1.5, cex.axis = 1.4)
 ##########
 Tnumb <- ifelse(dev == 30, 1, 2)
 Tcov <- paste0("T", Tnumb)
-pForm <- as.formula(paste0("scHR", Tnumb, "~ ", Tcov))
+pForm <- as.formula(paste0("HR", Tnumb, "~ ", Tcov))
 
 ### Go through each individual within each treatment:
   cnt <- 1
   for(t in levels(sdata$Trt)){
     plot(pForm, data = sdata, type = "n", axes = FALSE,
       xlim = c(0, 1.2),
-      ylim = c(-2.8, 3.45),
+      ylim = c(125, 400),
       main = "",
       xlab = "Time (min.)",
-      ylab = "30% Development\nHeart rate (standardized bpm)")
+      ylab = "30% Development\nHeart rate (bpm)")
     axis(1)
-    axis(2)
+    axis(2, at = seq(125, 400, 25), labels = FALSE)
+      axis(2, at = seq(150, 400, 50), lwd = 0)
     uid <- unique(as.character(sdata$EggID[which(sdata$Trt == t)]))
 
     
@@ -844,8 +846,7 @@ pForm <- as.formula(paste0("scHR", Tnumb, "~ ", Tcov))
       ##### Needed to plot lines
       sub_datf <- sub_datf[order(sub_datf[, Tcov]), ]
       ### Plot Individual observations
-      points(x = sub_datf[, Tcov],
-        y = sub_datf[, paste0("scHR", Tnumb)],
+      points(pForm, data = sub_datf,
         col = clr_trans[cnt], pch = 21, lwd = 2, cex = 0.8)
       ### Add predicted regression
       lines(x = sub_datf[, Tcov],
@@ -881,7 +882,8 @@ dev.off()
 sdata <- hrd  #<-- define temporary data for plotting script
 dev <- 80
 sdata$pred2 <- predict(hr2_fullFxd_Trt_REML, re.form = NULL)
-
+  sdata$pred2 <- sdata$pred2 * sd(sdata$HR2, na.rm = TRUE) +
+    mean(sdata$HR2, na.rm = TRUE)
 
 pdf(file = "Fig5_individRxnNorms_80dev.pdf",
   width = 12, height = 5)
@@ -891,31 +893,31 @@ par(mfrow = c(1, 3), mar = c(6, 6, 4, 1.1), cex.lab = 1.5, cex.axis = 1.4)
 ##########
 Tnumb <- ifelse(dev == 30, 1, 2)
 Tcov <- paste0("T", Tnumb)
-pForm <- as.formula(paste0("scHR", Tnumb, "~ ", Tcov))
+pForm <- as.formula(paste0("HR", Tnumb, "~ ", Tcov))
 
 ### Go through each individual within each treatment:
   cnt <- 1
   for(t in levels(sdata$Trt)){
     plot(pForm, data = sdata, type = "n", axes = FALSE,
       xlim = c(0, 1.2),
-      ylim = c(-2.8, 3.45),
+      ylim = c(125, 400),
       main = "",
       xlab = "Time (min.)",
-      ylab = "80% Development\nHeart rate (standardized bpm)")
+      ylab = "80% Development\nHeart rate (bpm)")
     axis(1)
-    axis(2)
+    axis(2, at = seq(125, 400, 25), labels = FALSE)
+      axis(2, at = seq(150, 400, 50), lwd = 0)
     uid <- unique(as.character(sdata$EggID[which(sdata$Trt == t)]))
 
     
     for(i in uid){
       ### Subset data for i-th ID/individual
-      sub_datf <- subset(sdata, EggID == i & !is.na(sdata$pred2))
+      sub_datf <- subset(sdata, EggID == i)
       #### Order subsetted data by increasing Time
       ##### Needed to plot lines
       sub_datf <- sub_datf[order(sub_datf[, Tcov]), ]
       ### Plot Individual observations
-      points(x = sub_datf[, Tcov],
-        y = sub_datf[, paste0("scHR", Tnumb)],
+      points(pForm, data = sub_datf,
         col = clr_trans[cnt], pch = 21, lwd = 2, cex = 0.8)
       ### Add predicted regression
       lines(x = sub_datf[, Tcov],
