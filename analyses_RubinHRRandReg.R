@@ -2,7 +2,7 @@ rm(list = ls())
 library(lmerTest) #library(lme4)
 library(emmeans)
 library(DHARMa)  #<-- for Durbin-Watson autocorrelation test on residuals
-
+library(optimx)  #<-- to use alternative optimizers in lme4
 
 #setwd("")   #<-- FIXME set this to working directory with data
 
@@ -726,10 +726,10 @@ plot(pForm, data = hrd1, type = "n", axes = FALSE,
   for(t in levels(hrd1$Trt)){
     ## Confidence Interval limits
     lines(lCL ~ I(T1wsdev + T1wsmn), data = cidata1, subset = cidata1$Trt == t,
-      col = clr[cnt], lwd = 2.5, lty = "dotted")
+      col = clr[cnt], lwd = 3.5, lty = "dotted")
     ## Confidence Interval limits
     lines(uCL ~ I(T1wsdev + T1wsmn), data = cidata1, subset = cidata1$Trt == t,
-      col = clr[cnt], lwd = 2.5, lty = "dotted")
+      col = clr[cnt], lwd = 3.5, lty = "dotted")
     cnt <- cnt + 1
   }
 
@@ -775,10 +775,10 @@ plot(pForm, data = hrd2, type = "n", axes = FALSE,
   for(t in levels(hrd2$Trt)){
     ## Confidence Interval limits
     lines(lCL ~ I(T2wsdev + T2wsmn), data = cidata2, subset = cidata2$Trt == t,
-      col = clr[cnt], lwd = 2.5, lty = "dotted")
+      col = clr[cnt], lwd = 3.5, lty = "dotted")
     ## Confidence Interval limits
     lines(uCL ~ I(T2wsdev + T2wsmn), data = cidata2, subset = cidata2$Trt == t,
-      col = clr[cnt], lwd = 2.5, lty = "dotted")
+      col = clr[cnt], lwd = 3.5, lty = "dotted")
     cnt <- cnt + 1
   }
 
@@ -857,7 +857,7 @@ msreCntsByEggID2 <- aggregate(HR2 ~ Trt + EggID, data = hrd2, FUN = length)
 
 ## Summary for all embryos (not by Dev or treatment)
 ### presented in main results section
-$mean(c(msreCntsByEggID1[, 3], msreCntsByEggID2[, 3]))
+mean(c(msreCntsByEggID1[, 3], msreCntsByEggID2[, 3]))
 median(c(msreCntsByEggID1[, 3], msreCntsByEggID2[, 3]))
 
 ## Now pull out summary statistics by Development stage and Treatment
@@ -897,6 +897,7 @@ cbind(aggregate(HR2 ~ Trt, data = msreCntsByEggID2, FUN = length),
 ## 30% Development
 sdata <- hrd1  #<-- define temporary "smooth data" for plotting script
 dev <- 30
+
 
 
 
