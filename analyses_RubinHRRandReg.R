@@ -1,9 +1,7 @@
 rm(list = ls())
 library(lmerTest) #library(lme4)
-library(wesanderson)  #<-- for creating color palettes used in figures
 library(emmeans)
 library(DHARMa)  #<-- for Durbin-Watson autocorrelation test on residuals
-
 
 
 #setwd("")   #<-- FIXME set this to working directory with data
@@ -43,20 +41,29 @@ hrd$Order2fac <- as.factor(hrd$Order2fac)
 
 
 # Color palette
-cl <- wes_palette("Darjeeling1")
-# Re-arrange cl to be more "heat-mappy" then do continuous/expansion of palette
-## below does "by hand" what `wes_palette(..., type = "continuous")` does
-clr <- structure(cl[c(1, 3, 2)],
-  class = "palette", name = paste(attr(cl, "name"), "3", sep = " "))
-# Number of unique IDs in each treatment
+## set up a color accessible palette to use for plotting throughout
+## checked with `colorblindcheck` that implements model of human color vision
+clr <- structure(c(blue = "#03244d", cyan = "#00A08A", orange = "#e86823"), 
+  class = "palette", name = "aucfriend")
+# check:
+## colorblindcheck::palette_check(clr, plot = TRUE)
+
+# Create gradient between colors so one unique per ID
+## Number of unique IDs in each treatment
 #aggregate(EggID ~ Trt, data = hrd, FUN = function(x) length(unique(x)))
 nin <- length(levels(hrd$EggID))
 clrg <-  structure(grDevices::colorRampPalette(clr)(nin),
     class = "palette",
-    name = paste(attr(clr, "name"), "custom heat gradient", sep = " "))
+    name = "aucfriend heat gradient")
 # Make transparent versions for plotting in the "background"
-clr_trans <- adjustcolor(clr, alpha.f = 0.2)
-clrg_trans <- adjustcolor(clrg, alpha.f = 0.2)
+clr_trans <- structure(adjustcolor(clr, alpha.f = 0.4),
+  class = "palette",
+  name = "aucfriend semi-transparent")
+clrg_trans <- structure(adjustcolor(clrg, alpha.f = 0.4),
+  class = "palette",
+  name = "aucfiend heat gradient semi-transparent")
+  
+
 
 
 
@@ -684,7 +691,7 @@ anova(Model1_hr2, Model3_hr2, refit = FALSE)
 # Fixed effects model predictions plot
 # (random effects not included)
 #######################################
-pdf(file = "Fig2_AverageWithinSubject.pdf",
+pdf(file = "Fig3_AverageWithinSubject.pdf",
   width = 12, height = 5)
 #x11(w = 12, h = 5)
 par(mfrow = c(1, 2), mar = c(6, 6, 5, 1.1), cex.lab = 1.3, cex.axis = 1.2)
@@ -1146,7 +1153,7 @@ for(d in 1:2){
         mains[which(tlvls == t)], "\n"))
       abline(h = 0, lwd = 2, col = "grey70")
       points(tform, data = hrd, subset = hrd$Trt == t,
-        pch = 21, col = cl[5], lwd = 1)
+        pch = 21, col = clr[1], lwd = 1)
   }    
 } 
 
@@ -1177,7 +1184,7 @@ for(d in 1:2){
         mains[which(tlvls == t)], "\n"))
       abline(h = 0, lwd = 2, col = "grey70")
       points(tform, data = hrd, subset = hrd$Trt == t,
-        pch = 21, col = cl[5], lwd = 1)
+        pch = 21, col = clr[1], lwd = 1)
       # add a smoothed spline
       lines(smooth.spline(x = hrd[which(hrd$Trt == t &
             !is.na(hrd[, paste0("T", d)])), paste0("T", d)],
@@ -1240,4 +1247,3 @@ dev.off()
 
 
 #  				FIN
-
