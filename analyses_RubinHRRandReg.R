@@ -807,6 +807,7 @@ dev.off()
 ###############################################################
 # Plot regression lines, by individual, to data on ORIGINAL scale of heart rates
 
+
 #####   30% Development   ###################
 sdata <- hrd  #<-- define temporary data for plotting script
 dev <- 30
@@ -814,11 +815,12 @@ sdata$pred1 <- predict(hr1_fullFxd_Trt_REML, re.form = NULL)
   sdata$pred1 <- sdata$pred1 * sd(sdata$HR1, na.rm = TRUE) +
     mean(sdata$HR1, na.rm = TRUE)
 
-pdf(file = "Fig4_individRxnNorms_30dev.pdf",
-  width = 12, height = 5)
-#x11(w = 12, h = 5)
+pdf(file = "Fig4_individRxnNorms.pdf",
+  width = 12, height = 10)
+#x11(w = 12, h = 10)
 ##########
-par(mfrow = c(1, 3), mar = c(6, 6, 4, 1.1), cex.lab = 1.5, cex.axis = 1.4)
+par(mfrow = c(2, 3), mar = c(6, 7.2, 4, 0.7),
+  cex.main = 2.4, cex.lab = 1.5, cex.axis = 1.4)
 ##########
 Tnumb <- ifelse(dev == 30, 1, 2)
 Tcov <- paste0("T", Tnumb)
@@ -832,7 +834,7 @@ pForm <- as.formula(paste0("HR", Tnumb, "~ ", Tcov))
       ylim = c(125, 400),
       main = "",
       xlab = "Time (min.)",
-      ylab = "30% Development\nHeart rate (bpm)")
+      ylab = "Heart rate (bpm)")
     axis(1)
     axis(2, at = seq(125, 400, 25), labels = FALSE)
       axis(2, at = seq(150, 400, 50), lwd = 0)
@@ -854,27 +856,33 @@ pForm <- as.formula(paste0("HR", Tnumb, "~ ", Tcov))
             col = clr[cnt], lwd = 1)
     }  #<-- end for i in unique IDs
 
-    if(t == "low"){
-      legend("top",
+    if(t == "per"){
+      legend("topright", inset = c(0, 0.09),
         pch = c(21, NA), pt.lwd = 2,
         lwd = c(NA, 3),
         col = "grey80",
         legend = c("observed", "predicted"))
     } 
+    if(t == "cont"){
+      mtext(text = "30% Development", side = 2, line = 5, adj = 0.5, cex = 1.6)
+    }
     cnt <- cnt + 1
      
   }  #<-- end for t in Treatments
   mtext(text = expression(bold(A)),
-    side = 3, line = 1, adj = -3.0, cex = 1.5)
+    side = 3, line = 1, adj = -3.0, cex = 1.4)
   mtext(text = expression(bold(B)),
-    side = 3, line = 1, adj = -1.6, cex = 1.5)
+    side = 3, line = 1, adj = -1.6, cex = 1.4)
   mtext(text = expression(bold(C)),
-    side = 3, line = 1, adj = -0.2, cex = 1.5)
+    side = 3, line = 1, adj = -0.2, cex = 1.4)
 
+  mtext(text = "Control",
+    side = 3, line = 1.5, adj = -3.2, cex = 1.6)
+  mtext(text = "Low",
+    side = 3, line = 1.5, adj = -1.0, cex = 1.6)
+  mtext(text = "Periodic",
+    side = 3, line = 1.5, adj = 0.5, cex = 1.6)
 
-
-
-dev.off() 
 
 
 
@@ -885,12 +893,6 @@ sdata$pred2 <- predict(hr2_fullFxd_Trt_REML, re.form = NULL)
   sdata$pred2 <- sdata$pred2 * sd(sdata$HR2, na.rm = TRUE) +
     mean(sdata$HR2, na.rm = TRUE)
 
-pdf(file = "Fig5_individRxnNorms_80dev.pdf",
-  width = 12, height = 5)
-#x11(w = 12, h = 5)
-##########
-par(mfrow = c(1, 3), mar = c(6, 6, 4, 1.1), cex.lab = 1.5, cex.axis = 1.4)
-##########
 Tnumb <- ifelse(dev == 30, 1, 2)
 Tcov <- paste0("T", Tnumb)
 pForm <- as.formula(paste0("HR", Tnumb, "~ ", Tcov))
@@ -903,7 +905,7 @@ pForm <- as.formula(paste0("HR", Tnumb, "~ ", Tcov))
       ylim = c(125, 400),
       main = "",
       xlab = "Time (min.)",
-      ylab = "80% Development\nHeart rate (bpm)")
+      ylab = "Heart rate (bpm)")
     axis(1)
     axis(2, at = seq(125, 400, 25), labels = FALSE)
       axis(2, at = seq(150, 400, 50), lwd = 0)
@@ -924,23 +926,19 @@ pForm <- as.formula(paste0("HR", Tnumb, "~ ", Tcov))
             y = sub_datf[, "pred2"],
             col = clr[cnt], lwd = 1)
     }  #<-- end for i in unique IDs
+    if(t == "cont"){
+      mtext(text = "80% Development", side = 2, line = 5, adj = 0.5, cex = 1.6)
+    }
 
-    if(t == "low"){
-      legend("top",
-        pch = c(21, NA), pt.lwd = 2,
-        lwd = c(NA, 3),
-        col = "grey80",
-        legend = c("observed", "predicted"))
-    } 
     cnt <- cnt + 1
      
   }  #<-- end for t in Treatments
-  mtext(text = expression(bold(A)),
-    side = 3, line = 1, adj = -3.0, cex = 1.5)
-  mtext(text = expression(bold(B)),
-    side = 3, line = 1, adj = -1.6, cex = 1.5)
-  mtext(text = expression(bold(C)),
-    side = 3, line = 1, adj = -0.2, cex = 1.5)
+  mtext(text = expression(bold(D)),
+    side = 3, line = 1, adj = -3.0, cex = 1.4)
+  mtext(text = expression(bold(E)),
+    side = 3, line = 1, adj = -1.6, cex = 1.4)
+  mtext(text = expression(bold(F)),
+    side = 3, line = 1, adj = -0.2, cex = 1.4)
 
 
 
