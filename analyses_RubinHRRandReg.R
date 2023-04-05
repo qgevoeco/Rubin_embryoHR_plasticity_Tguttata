@@ -139,7 +139,7 @@ hr1_fullFxd_REML <- lmer(scHR1 ~ Trt + T1wsmn:Trt + T1wsdev:Trt +
 hr1_fullFxd_Vint_REML <- lmer(scHR1 ~ Trt + T1wsmn:Trt + T1wsdev:Trt +
 	(1 | EggID) + (1 | NestID),
 	data = hrd, REML = TRUE, na.action = na.exclude)
-### Also fit model with random intercepts and slops UNCORRELATED to compare at once
+### Also fit model with random intercepts and slopes UNCORRELATED to compare at once
 hr1_fullFxd_VintVslo_REML <- lmer(scHR1 ~ Trt + T1wsmn:Trt + T1wsdev:Trt +
 	(1 | EggID) + (0 + T1 | EggID) + (1 | NestID),
 	data = hrd, REML = TRUE, na.action = na.exclude)
