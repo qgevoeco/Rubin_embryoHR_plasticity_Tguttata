@@ -988,6 +988,21 @@ eggTemp <- within(eggTemp, {
   tempTrt <- as.factor(tempTrt)  
 })
 
+# total number of measurements and number of individual eggs
+nrow(eggTemp)
+length(unique(eggTemp$EggID))
+  # by treatment
+  aggregate(temp ~ tempTrt, data = eggTemp, FUN = length)
+  aggregate(EggID ~ tempTrt, data = eggTemp, FUN = function(x) length(unique(x)))
+  
+# Range, min, mean, median, and max of number measures per individual
+msreCntsByEggID <- aggregate(temp ~ tempTrt + EggID, data = eggTemp, FUN = length)
+## Summary for all eggs (not by treatment)
+mean(msreCntsByEggID[, 3])
+median(msreCntsByEggID[, 3])
+range(msreCntsByEggID[, 3])
+
+
 ############################################################
 # fit spline models
 splFit <- lmer(temp ~ ns(time, df = 3) * tempTrt + eggMass +
