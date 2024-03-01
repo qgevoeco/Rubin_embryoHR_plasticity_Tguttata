@@ -3,6 +3,7 @@ library(lmerTest) #library(lme4)
 library(emmeans)
 library(DHARMa)  #<-- for Durbin-Watson autocorrelation test on residuals
 library(optimx)  #<-- to use alternative optimizers in lme4
+library(splines) #<-- needed for Supp. Info. egg temperature analyses
 
 #setwd("")   #<-- FIXME set this to working directory with data
 
@@ -980,6 +981,167 @@ dev.off()
 
 #Load data
 eggTemp <- read.table("data_RubinEggTemp.txt", header = TRUE)
+
+## Make R factors
+eggTemp <- within(eggTemp, {
+  EggID <- as.factor(EggID)
+  tempTrt <- as.factor(tempTrt)  
+})
+
+############################################################
+# fit spline models
+splFit <- lmer(temp ~ ns(time, df = 3) * tempTrt + eggMass +
+    (1 | EggID),
+  data = eggTemp) 
+summary(splFit)
+
+# compare to first order
+splFit1 <- lmer(temp ~ ns(time, df = 1) * tempTrt + eggMass +
+    (1 | EggID),
+  data = eggTemp) 
+summary(splFit1)
+
+anova(splFit, splFit1)
+
+######################################  
+# Do this quadratically
+pFit3 <- lmer(temp ~ poly(time, 3) * tempTrt + eggMass +
+    (1 | EggID),
+  data = eggTemp)
+summary(pFit3)
+
+pFit2 <- lmer(temp ~ poly(time, 2) * tempTrt + eggMass +
+    (1 | EggID),
+  data = eggTemp)
+summary(pFit2)
+
+pFit1 <- lmer(temp ~ poly(time, 1) * tempTrt + eggMass +
+    (1 | EggID),
+  data = eggTemp)
+summary(pFit1)
+
+
+anova(pFit1, pFit2, pFit3)
+
+
+######################################  
+# Plots
+
+## Model Predicted treatment averages
+
+### generate model predictions for plotting
+#### need a new data.frame from which the models can predict
+ndat <- with(eggTemp, {
+  data.frame(time = rep(seq(min(time), max(time), length.out = 100), 2),
+    tempTrt = as.factor(rep(levels(tempTrt), each = 100)),
+    eggMass = mean(eggMass))
+})
+
+ndat$splPred <- predict(splFit, newdata = ndat, re.form = NA)
+ndat$plyPred2 <- predict(pFit2, newdata = ndat, re.form = NA)
+ndat$plyPred1 <- predict(pFit1, newdata = ndat, re.form = NA)
+
+
+pdf(file = "FigSI1-1_AvgEggTemperature.pdf",
+  width = 12, height = 5)
+#x11(w = 12, h = 5)
+##########
+par(mfrow = c(1, 3), mar = c(6, 6, 4, 1.1), cex.lab = 1.5, cex.axis = 1.4)
+
+for(l in c("splPred", "plyPred2", "plyPred1")){
+  plot(temp ~ time, data = eggTemp, axes = FALSE, 
+    pch = 21,
+    col = clr[c("cyan", "blue")][as.integer(eggTemp$tempTrt)],
+    xlab = "Time (sec.)", ylab = "Temperature (\u00B0C)", main = "",
+    xlim = c(0, 90), ylim = c(29, 37))
+  for(t in levels(ndat$tempTrt)){
+    subdf <- ndat[which(ndat$tempTrt == t), ]
+    lines(subdf[, l] ~ time, data = subdf,
+      col = clr[c("cyan", "blue")][as.integer(subdf$tempTrt)],
+      lwd = 4)
+  }  #<-- end for t through temperature treatments
+  axis(1, at = seq(0, 90, 15))
+  axis(2, at = seq(29, 37, 1))
+  
+  # place legend in middle plot
+  if(l == "plyPred2"){
+    legend("topright", inset = c(0.025, 0.01), pch = 21, pt.bg = "white",
+      col = clr[c("blue", "cyan")], lwd = 3,
+      legend = rev(paste0(levels(ndat$tempTrt), "\u00B0C")))
+  }
+  
+}  #<-- end for l through model/prediction line type
+
+
+mtext(text = expression(bold(A)),
+  side = 3, line = 1, adj = -3.0, cex = 1.5)
+mtext(text = expression(bold(B)),
+  side = 3, line = 1, adj = -1.6, cex = 1.5)
+mtext(text = expression(bold(C)),
+  side = 3, line = 1, adj = -0.2, cex = 1.5)
+
+
+dev.off()
+
+
+
+
+
+
+## Individual Egg Cooling
+
+### generate model predictions for plotting
+eggTemp$splPred <- predict(splFit)
+eggTemp$plyPred2 <- predict(pFit2)
+eggTemp$plyPred1 <- predict(pFit1)
+######################################  
+
+
+pdf(file = "FigSI1-2_IndividualEggTemperature.pdf",
+  width = 12, height = 5)
+#x11(w = 12, h = 5)
+##########
+par(mfrow = c(1, 3), mar = c(6, 6, 4, 1.1), cex.lab = 1.5, cex.axis = 1.4)
+
+for(l in c("splPred", "plyPred2", "plyPred1")){
+  plot(temp ~ time, data = eggTemp, axes = FALSE, 
+    pch = 21,
+    col = clr[c("cyan", "blue")][as.integer(eggTemp$tempTrt)],
+    xlab = "Time (sec.)", ylab = "Temperature (\u00B0C)", main = "",
+    xlim = c(0, 90), ylim = c(29, 37))
+  uid <- unique(eggTemp$EggID)  
+  for(i in uid){
+    subdf <- eggTemp[which(eggTemp$EggID == i), ]
+    subdfOrd <- subdf[order(subdf$time), ]
+    lines(subdf[, l] ~ time, data = subdf,
+      col = clr[c("cyan", "blue")][as.integer(subdf$tempTrt)],
+      lwd = 2.5)
+  }  #<-- end for i through individuals
+  axis(1, at = seq(0, 90, 15))
+  axis(2, at = seq(29, 37, 1))
+  
+  # place legend in middle plot
+  if(l == "plyPred2"){
+    legend("topright", inset = c(0.025, 0.01), pch = 21, pt.bg = "white",
+      col = clr[c("blue", "cyan")], lwd = 3,
+      legend = rev(paste0(levels(eggTemp$tempTrt), "\u00B0C")))
+  }
+  
+}  #<-- end for l through model/prediction line type
+
+
+mtext(text = expression(bold(A)),
+  side = 3, line = 1, adj = -3.0, cex = 1.5)
+mtext(text = expression(bold(B)),
+  side = 3, line = 1, adj = -1.6, cex = 1.5)
+mtext(text = expression(bold(C)),
+  side = 3, line = 1, adj = -0.2, cex = 1.5)
+
+
+dev.off()
+
+
+
 
 
 
