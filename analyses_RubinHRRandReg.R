@@ -982,10 +982,11 @@ dev.off()
 #Load data
 eggTemp <- read.table("data_RubinEggTemp.txt", header = TRUE)
 
-## Make R factors
+## Make R factors and mean-center and sd-standardize egg mass
 eggTemp <- within(eggTemp, {
   EggID <- as.factor(EggID)
   tempTrt <- as.factor(tempTrt)  
+  SCeggMass <- scale(eggMass)
 })
 
 # total number of measurements and number of individual eggs
@@ -1005,34 +1006,39 @@ range(msreCntsByEggID[, 3])
 
 ############################################################
 # fit spline models
-splFit <- lmer(temp ~ ns(time, df = 3) * tempTrt + eggMass +
+splFit <- lmer(temp ~ ns(time, df = 3) * tempTrt + SCeggMass +
     (1 | EggID),
-  data = eggTemp) 
+  data = eggTemp,
+  REML = FALSE) 
 summary(splFit)
 
 # compare to first order
-splFit1 <- lmer(temp ~ ns(time, df = 1) * tempTrt + eggMass +
+splFit1 <- lmer(temp ~ ns(time, df = 1) * tempTrt + SCeggMass +
     (1 | EggID),
-  data = eggTemp) 
+  data = eggTemp,
+  REML = FALSE)  
 summary(splFit1)
 
 anova(splFit, splFit1)
 
 ######################################  
 # Do this quadratically
-pFit3 <- lmer(temp ~ poly(time, 3) * tempTrt + eggMass +
+pFit3 <- lmer(temp ~ poly(time, 3) * tempTrt + SCeggMass +
     (1 | EggID),
-  data = eggTemp)
+  data = eggTemp,
+  REML = FALSE) 
 summary(pFit3)
 
-pFit2 <- lmer(temp ~ poly(time, 2) * tempTrt + eggMass +
+pFit2 <- lmer(temp ~ poly(time, 2) * tempTrt + SCeggMass +
     (1 | EggID),
-  data = eggTemp)
+  data = eggTemp,
+  REML = FALSE) 
 summary(pFit2)
 
-pFit1 <- lmer(temp ~ poly(time, 1) * tempTrt + eggMass +
+pFit1 <- lmer(temp ~ poly(time, 1) * tempTrt + SCeggMass +
     (1 | EggID),
-  data = eggTemp)
+  data = eggTemp,
+  REML = FALSE) 
 summary(pFit1)
 
 
@@ -1049,7 +1055,7 @@ anova(pFit1, pFit2, pFit3)
 ndat <- with(eggTemp, {
   data.frame(time = rep(seq(min(time), max(time), length.out = 100), 2),
     tempTrt = as.factor(rep(levels(tempTrt), each = 100)),
-    eggMass = mean(eggMass))
+    SCeggMass = mean(SCeggMass))  #<-- predictions will be marginal to Egg Mass
 })
 
 ndat$splPred <- predict(splFit, newdata = ndat, re.form = NA)
@@ -1082,7 +1088,7 @@ for(l in c("splPred", "plyPred2", "plyPred1")){
   if(l == "plyPred2"){
     legend("topright", inset = c(0.025, 0.01), pch = 21, pt.bg = "white",
       col = clr[c("blue", "cyan")], lwd = 3,
-      legend = rev(paste0(levels(ndat$tempTrt), "\u00B0C")))
+      legend = c("Control", "Low"))
   }
   
 }  #<-- end for l through model/prediction line type
@@ -1139,7 +1145,7 @@ for(l in c("splPred", "plyPred2", "plyPred1")){
   if(l == "plyPred2"){
     legend("topright", inset = c(0.025, 0.01), pch = 21, pt.bg = "white",
       col = clr[c("blue", "cyan")], lwd = 3,
-      legend = rev(paste0(levels(eggTemp$tempTrt), "\u00B0C")))
+      legend = c("Control", "Low"))
   }
   
 }  #<-- end for l through model/prediction line type

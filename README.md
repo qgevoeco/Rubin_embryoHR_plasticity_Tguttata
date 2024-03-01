@@ -12,5 +12,6 @@ If you use the data, please cite the data package TBD
 For ease of reference, an overview of significant changes to be noted below. Tag with commits or issues, where appropriate.
 
 ### Major
-
+  - Added an egg temperature cooling dataset and analyses (March 2024)
+  
 ### Minor
