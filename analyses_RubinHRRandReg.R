@@ -970,18 +970,31 @@ dev.off()
 ################################################################################
 ################################################################################
 
+################################################################################
+
+#			SI 1
+
+# EGG TEMPERATURE COOLING EXPERIMENT
+
+################################################################################
+
+#Load data
+eggTemp <- read.table("data_RubinEggTemp.txt", header = TRUE)
+
+
+
 
 
 ################################################################################
 
-#			SI 1
+#			SI 2
 
 # DESCRIPTIVE STATISTICS
 
 ################################################################################
 
 
-# TABLE SI 1
+# TABLE SI 2
 # Range, min, mean, median, and max of number measures per individual
 msreCntsByEggID1 <- aggregate(HR1 ~ Trt + EggID, data = hrd1, FUN = length)
 msreCntsByEggID2 <- aggregate(HR2 ~ Trt + EggID, data = hrd2, FUN = length)
@@ -1018,7 +1031,7 @@ cbind(aggregate(HR2 ~ Trt, data = msreCntsByEggID2, FUN = length),
 
 ################################################################################
 
-#			SI 2
+#			SI 3
 
 # Splines to assess suitability of LINEAR REACTION NORMS
 
@@ -1032,7 +1045,7 @@ dev <- 30
 
 
 
-pdf(file = "FigSI2-1_SmoothedSplines_30dev.pdf",
+pdf(file = "FigSI3-1_SmoothedSplines_30dev.pdf",
   width = 12, height = 5)
 #x11(w = 12, h = 5)
 ##########
@@ -1111,7 +1124,7 @@ dev <- 80
 
 
 
-pdf(file = "FigSI2-2_SmoothedSplines_80dev.pdf",
+pdf(file = "FigSI3-2_SmoothedSplines_80dev.pdf",
   width = 12, height = 5)
 #x11(w = 12, h = 5)
 ##########
@@ -1190,7 +1203,7 @@ dev.off()
 
 ################################################################################
 
-#			SI 4
+#			SI 5
 
 # ORDER AND MASS EFFECTS
 
@@ -1210,7 +1223,7 @@ hr1_fullFxd_ordMass_Trt_REML <- lmer(scHR1 ~ Trt + T1wsmn:Trt + T1wsdev:Trt +
         	optCtrl = list(method="L-BFGS-B")))
 
 summary(hr1_fullFxd_ordMass_Trt_REML)
-# Table S4.1
+# Table S5.1
 anova(hr1_fullFxd_ordMass_Trt_REML)
   
 
@@ -1229,7 +1242,7 @@ hr2_fullFxd_ordMass_Trt_REML <- lmer(scHR2 ~ Trt + T2wsmn:Trt + T2wsdev:Trt +
         	optCtrl = list(method="L-BFGS-B")))
 
 summary(hr2_fullFxd_ordMass_Trt_REML)
-# Table S4.2
+# Table S5.2
 anova(hr2_fullFxd_ordMass_Trt_REML)
   
 
@@ -1241,7 +1254,7 @@ anova(hr2_fullFxd_ordMass_Trt_REML)
 
 ################################################################################
 
-#			SI 5
+#			SI 6
 
 # MODEL RESIDUAL INSPECTION
 
@@ -1258,7 +1271,7 @@ stdResHR2 <- na.omit(hrd$stdRes2)
 
 
 # Q-Q plot of standardized residuals
-pdf(file = "FigSI5-1_QQplot_StdizdResiduals.pdf",
+pdf(file = "FigSI6-1_QQplot_StdizdResiduals.pdf",
   width = 8, height = 5)
 #x11(w = 8, h = 5)
 ##########
@@ -1279,7 +1292,7 @@ dev.off()
 mains <- c("Control", "Low", "Periodic")
 tlvls <- levels(hrd$Trt)
 
-pdf(file = "FigSI5-2_StdizdResiduals-VS-Fitted.pdf",
+pdf(file = "FigSI6-2_StdizdResiduals-VS-Fitted.pdf",
   width = 12, height = 10)
 #x11(w = 12, h = 10)
 par(mfrow = c(2, 3), mar = c(6, 6, 7, 1),
@@ -1310,7 +1323,7 @@ dev.off()
 
 
 # Standardized residuals versus TIME by Treatment
-pdf(file = "FigSI5-3_StdizdResiduals-VS-Time.pdf",
+pdf(file = "FigSI6-3_StdizdResiduals-VS-Time.pdf",
   width = 12, height = 10)
 #x11(w = 12, h = 10)
 par(mfrow = c(2, 3), mar = c(6, 6, 7, 1),
@@ -1353,7 +1366,7 @@ res2 <- simulateResiduals(lmm2b)
 
 
 # 30% Development
-pdf(file = "FigSI5-4_Autocorr_StdizdResiduals_30dev.pdf",
+pdf(file = "FigSI6-4_Autocorr_StdizdResiduals_30dev.pdf",
   width = 8, height = 5)
 #x11(w = 8, h = 5)
 par(mar = c(5, 6, 5, 1),
@@ -1364,7 +1377,7 @@ dev.off()
 
 
 # 80% Development
-pdf(file = "FigSI5-5_Autocorr_StdizdResiduals_80dev.pdf",
+pdf(file = "FigSI6-5_Autocorr_StdizdResiduals_80dev.pdf",
   width = 8, height = 5)
 #x11(w = 8, h = 5)
 par(mar = c(5, 6, 5, 1),
